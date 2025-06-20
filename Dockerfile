@@ -1,14 +1,31 @@
-# Używamy oficjalnego obrazu JDK do uruchomienia aplikacji
-FROM eclipse-temurin:17-jdk-alpine
 
-# Ustaw katalog roboczy w kontenerze
+FROM gradle:8.3-jdk17 AS builder
+
+
 WORKDIR /app
 
-# Kopiujemy JAR do kontenera
-COPY build/libs/*.jar app.jar
 
-# Expose port (domyślnie Spring Boot działa na 8080)
+COPY gradle gradle
+COPY gradlew .
+COPY build.gradle .
+COPY settings.gradle .
+
+
+RUN ./gradlew build --no-daemon || return 0
+
+
+COPY src src
+
+RUN ./gradlew clean build --no-daemon
+
+
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+
 EXPOSE 8080
 
-# Komenda uruchamiająca aplikację
 ENTRYPOINT ["java", "-jar", "app.jar"]
