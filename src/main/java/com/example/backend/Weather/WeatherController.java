@@ -9,7 +9,8 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+
+@CrossOrigin(origins = {"http://localhost:3000", "https://recrutationfrontend.fly.dev/"})
 @RestController
 public class WeatherController {
     private final WeatherService weatherService;
